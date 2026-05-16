@@ -100,7 +100,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               {renderStars(product.rating)}
             </div>
             <span className="text-xs font-semibold text-amber-400">{product.rating}</span>
-            <span className="text-[11px] text-muted-foreground">({product.reviewCount.toLocaleString('it-IT')})</span>
+            <span className="text-[11px] text-muted-foreground">({product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')})</span>
           </div>
 
           {/* Price */}

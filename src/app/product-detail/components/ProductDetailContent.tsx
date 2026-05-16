@@ -179,7 +179,7 @@ export default function ProductDetailContent() {
                   {renderStars(product.rating)}
                 </div>
                 <span className="text-sm font-bold text-amber-400">{product.rating}/5</span>
-                <span className="text-sm text-muted-foreground">({product.reviewCount.toLocaleString('it-IT')} recensioni)</span>
+                <span className="text-sm text-muted-foreground">({product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} recensioni)</span>
               </div>
 
               <p className="text-base text-muted-foreground leading-relaxed">
@@ -401,7 +401,7 @@ export default function ProductDetailContent() {
               { label: 'Lingua', value: 'Multilingua (include Italiano)' },
               { label: 'Formato', value: 'Chiave di attivazione digitale' },
               { label: 'Disponibilità', value: product.inStock ? '✓ Disponibile' : '✗ Esaurito' },
-              { label: 'Valutazione', value: `${product.rating}/5 (${product.reviewCount.toLocaleString('it-IT')} recensioni)` },
+              { label: 'Valutazione', value: `${product.rating}/5 (${product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} recensioni)` },
             ].map((row, i) => (
               <div
                 key={row.label}
@@ -420,7 +420,7 @@ export default function ProductDetailContent() {
         <section className="mt-16 space-y-8">
           <div className="flex items-center justify-between">
             <h2 className="section-title">Recensioni clienti</h2>
-            <span className="text-sm text-muted-foreground">{product.reviewCount.toLocaleString('it-IT')} recensioni</span>
+            <span className="text-sm text-muted-foreground">{product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} recensioni</span>
           </div>
 
           <div className="grid md:grid-cols-[280px_1fr] gap-8">
@@ -431,7 +431,7 @@ export default function ProductDetailContent() {
                 <div className="flex items-center justify-center gap-1 my-2">
                   {renderStars(product.rating, 18)}
                 </div>
-                <p className="text-sm text-muted-foreground">{product.reviewCount.toLocaleString('it-IT')} recensioni verificate</p>
+                <p className="text-sm text-muted-foreground">{product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} recensioni verificate</p>
               </div>
               <div className="space-y-2">
                 {ratingBreakdown.map((r) => (
