@@ -6,8 +6,26 @@ import HeroSection from '@/app/components/HeroSection';
 import CategoryGrid from '@/app/components/CategoryGrid';
 import FeaturedCarousels from '@/app/components/FeaturedCarousels';
 import TrustBar from '@/app/components/TrustBar';
+import { getProducts, getCollectionProducts } from '@/lib/shopify';
+import { mapShopifyProducts } from '@/lib/shopify/mappers';
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch products from Shopify in parallel
+  const [allProducts, antivirusRaw, gamingRaw] = await Promise.all([
+    getProducts({ first: 20 }).catch(() => []),
+    getCollectionProducts({ collection: 'antivirus-sicurezza', limit: 8 }).catch(() => []),
+    getCollectionProducts({ collection: 'giochi-pc', limit: 8 }).catch(() => []),
+  ]);
+
+  // Map Shopify products to Licenvo Product type
+  const products = mapShopifyProducts(allProducts);
+  const antivirus = mapShopifyProducts(antivirusRaw, 'antivirus-sicurezza');
+  const gaming = mapShopifyProducts(gamingRaw, 'giochi-pc');
+
+  // Derive featured and hot deals from all products
+  const featured = products.filter((p) => p.badge === 'bestseller');
+  const hotDeals = products.filter((p) => p.discount >= 80);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -16,7 +34,12 @@ export default function HomePage() {
         <HeroSection />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <CategoryGrid />
-          <FeaturedCarousels />
+          <FeaturedCarousels
+            featured={featured}
+            hotDeals={hotDeals}
+            antivirus={antivirus}
+            gaming={gaming}
+          />
         </div>
         <TrustBar />
       </main>

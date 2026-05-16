@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
-import { Product } from '@/lib/products';
-import { useCartStore } from '@/lib/cart-store';
+import { Product } from '@/lib/shopify/types';
+import { useCart } from '@/lib/shopify/cart-context';
 
 interface ProductCardProps {
   product: Product;
@@ -25,12 +25,19 @@ const licenseConfig = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [added, setAdded] = useState(false);
-  const { addItem, openCart } = useCartStore();
+  const { addItem } = useCart();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product);
+    if (product.shopifyVariantId) {
+      addItem(product.shopifyVariantId, {
+        title: product.name,
+        image: product.image,
+        handle: product.id,
+        price: product.price,
+      });
+    }
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
   };
@@ -78,7 +85,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Delivery */}
           <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm text-white/80 text-[10px] font-medium px-2 py-1 rounded-lg border border-white/10">
             <Icon name={product.deliveryType === 'instant' ? 'Zap' : 'Clock'} size={10} />
-            {product.deliveryType === 'instant' ? 'Istantaneo' : '24h'}
+            {product.deliveryType === 'instant' ? 'Istantaneo' : product.deliveryType === '15min' ? 'Entro 15 min' : '24h'}
           </div>
         </div>
 
@@ -100,7 +107,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               {renderStars(product.rating)}
             </div>
             <span className="text-xs font-semibold text-amber-400">{product.rating}</span>
-            <span className="text-[11px] text-muted-foreground">({product.reviewCount.toLocaleString('it-IT')})</span>
+            <span className="text-[11px] text-muted-foreground">({product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')})</span>
           </div>
 
           {/* Price */}

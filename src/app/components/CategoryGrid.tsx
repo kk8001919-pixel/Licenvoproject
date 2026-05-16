@@ -3,15 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
-import { categories } from '@/lib/products';
 
-const categoryIcons: Record<string, string> = {
-  os: 'Monitor',
-  office: 'FileText',
-  subscription: 'Layers',
-  antivirus: 'Shield',
-  gaming: 'Gamepad2',
-};
+const categories = [
+  { id: 'os', label: 'Sistemi Operativi', icon: 'Monitor', color: 'from-blue-600 to-blue-800', count: '3+' },
+  { id: 'office', label: 'Office & Produttivita', icon: 'FileText', color: 'from-orange-500 to-red-600', count: '3+' },
+  { id: 'subscription', label: 'Software Pro', icon: 'Layers', color: 'from-violet-600 to-purple-700', count: '4+' },
+  { id: 'antivirus', label: 'Antivirus & Sicurezza', icon: 'Shield', color: 'from-green-600 to-emerald-700', count: '4+' },
+  { id: 'gaming', label: 'Giochi PC', icon: 'Gamepad2', color: 'from-yellow-400 to-orange-500', count: '4+' },
+];
 
 export default function CategoryGrid() {
   return (

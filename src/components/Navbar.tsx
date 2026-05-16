@@ -3,19 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
-import { useCartStore } from '@/lib/cart-store';
+import { useCart } from '@/lib/shopify/cart-context';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { openCart, itemCount } = useCartStore();
+  const { openCart, itemCount } = useCart();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const count = mounted ? itemCount() : 0;
+  const count = mounted ? itemCount : 0;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);

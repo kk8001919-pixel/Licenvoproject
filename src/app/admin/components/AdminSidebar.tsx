@@ -4,7 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Icon from '@/components/ui/AppIcon';
-import { useSupportStore } from '@/lib/support-store';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },
@@ -18,7 +17,6 @@ const navItems = [
 
 export default function AdminSidebar({ onLogout }: { onLogout: () => void }) {
   const pathname = usePathname();
-  const unread = useSupportStore((s) => s.getUnreadCount());
 
   return (
     <aside className="fixed left-0 top-0 h-full w-64 bg-[#0d0d14] border-r border-white/[0.06] flex flex-col z-40">
@@ -37,7 +35,6 @@ export default function AdminSidebar({ onLogout }: { onLogout: () => void }) {
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const active = pathname.startsWith(item.href);
-          const isSupport = item.href === '/admin/support';
           return (
             <Link
               key={item.href}
@@ -50,11 +47,6 @@ export default function AdminSidebar({ onLogout }: { onLogout: () => void }) {
             >
               <Icon name={item.icon as 'LayoutDashboard'} size={16} className={active ? 'text-primary' : ''} />
               <span className="flex-1">{item.label}</span>
-              {isSupport && unread > 0 && (
-                <span className="min-w-[20px] h-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-black px-1.5">
-                  {unread > 9 ? '9+' : unread}
-                </span>
-              )}
             </Link>
           );
         })}

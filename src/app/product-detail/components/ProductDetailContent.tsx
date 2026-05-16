@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
 import ProductCarousel from '@/components/ProductCarousel';
-import { getProductById, getSimilarProducts, products, DurationVariant } from '@/lib/products';
-import { useCartStore } from '@/lib/cart-store';
+import type { Product, DurationVariant } from '@/lib/shopify/types';
+import { useCart } from '@/lib/shopify/cart-context';
 
 const mockReviews = [
   {
@@ -51,18 +50,18 @@ const mockReviews = [
   },
 ];
 
-export default function ProductDetailContent() {
-  const searchParams = useSearchParams();
-  const productId = searchParams.get('id') || products[0].id;
-  const product = getProductById(productId) || products[0];
-  const similar = getSimilarProducts(product, 6);
+interface ProductDetailContentProps {
+  product: Product;
+  similar: Product[];
+}
 
+export default function ProductDetailContent({ product, similar }: ProductDetailContentProps) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<DurationVariant | null>(
     product.durationVariants?.[0] ?? null
   );
-  const { addItem, openCart } = useCartStore();
+  const { addItem, openCart } = useCart();
 
   useEffect(() => {
     setSelectedVariant(product.durationVariants?.[0] ?? null);
@@ -74,19 +73,18 @@ export default function ProductDetailContent() {
   const activeDiscount = Math.round((1 - activePrice / activeOriginalPrice) * 100);
 
   const handleAddToCart = () => {
-    const productToAdd = selectedVariant
-      ? {
-          ...product,
-          id: `${product.id}-${selectedVariant.id}`,
-          price: selectedVariant.price,
-          originalPrice: selectedVariant.originalPrice,
-          name: `${product.name} — ${selectedVariant.label}`,
-          discount: activeDiscount,
-        }
-      : product;
+    const variantId = selectedVariant?.id || product.shopifyVariantId;
+    if (!variantId) return;
 
     for (let i = 0; i < qty; i++) {
-      addItem(productToAdd);
+      addItem(variantId, {
+        title: selectedVariant
+          ? `${product.name} — ${selectedVariant.label}`
+          : product.name,
+        image: product.image,
+        handle: product.id,
+        price: activePrice,
+      });
     }
     setAdded(true);
     setTimeout(() => {
@@ -161,7 +159,7 @@ export default function ProductDetailContent() {
               {/* Delivery badge */}
               <div className="absolute bottom-6 right-6 flex items-center gap-2 bg-black/60 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2 rounded-xl border border-white/20">
                 <Icon name={product.deliveryType === 'instant' ? 'Zap' : 'Clock'} size={15} className="text-yellow-400" />
-                {product.deliveryType === 'instant' ? 'Consegna istantanea' : 'Consegna entro 24h'}
+                {product.deliveryType === 'instant' ? 'Consegna istantanea' : product.deliveryType === '15min' ? 'Consegna entro 15 min' : 'Consegna entro 24h'}
               </div>
             </div>
 
@@ -179,7 +177,7 @@ export default function ProductDetailContent() {
                   {renderStars(product.rating)}
                 </div>
                 <span className="text-sm font-bold text-amber-400">{product.rating}/5</span>
-                <span className="text-sm text-muted-foreground">({product.reviewCount.toLocaleString('it-IT')} recensioni)</span>
+                <span className="text-sm text-muted-foreground">({product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} recensioni)</span>
               </div>
 
               <p className="text-base text-muted-foreground leading-relaxed">
@@ -401,7 +399,7 @@ export default function ProductDetailContent() {
               { label: 'Lingua', value: 'Multilingua (include Italiano)' },
               { label: 'Formato', value: 'Chiave di attivazione digitale' },
               { label: 'Disponibilità', value: product.inStock ? '✓ Disponibile' : '✗ Esaurito' },
-              { label: 'Valutazione', value: `${product.rating}/5 (${product.reviewCount.toLocaleString('it-IT')} recensioni)` },
+              { label: 'Valutazione', value: `${product.rating}/5 (${product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} recensioni)` },
             ].map((row, i) => (
               <div
                 key={row.label}
@@ -420,7 +418,7 @@ export default function ProductDetailContent() {
         <section className="mt-16 space-y-8">
           <div className="flex items-center justify-between">
             <h2 className="section-title">Recensioni clienti</h2>
-            <span className="text-sm text-muted-foreground">{product.reviewCount.toLocaleString('it-IT')} recensioni</span>
+            <span className="text-sm text-muted-foreground">{product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} recensioni</span>
           </div>
 
           <div className="grid md:grid-cols-[280px_1fr] gap-8">
@@ -431,7 +429,7 @@ export default function ProductDetailContent() {
                 <div className="flex items-center justify-center gap-1 my-2">
                   {renderStars(product.rating, 18)}
                 </div>
-                <p className="text-sm text-muted-foreground">{product.reviewCount.toLocaleString('it-IT')} recensioni verificate</p>
+                <p className="text-sm text-muted-foreground">{product.reviewCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} recensioni verificate</p>
               </div>
               <div className="space-y-2">
                 {ratingBreakdown.map((r) => (
