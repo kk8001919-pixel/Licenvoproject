@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
 import ProductCard from './ProductCard';
-import { Product } from '@/lib/products';
+import { Product } from '@/lib/shopify/types';
 
 interface ProductCarouselProps {
   title: string;

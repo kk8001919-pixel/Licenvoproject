@@ -5,17 +5,29 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
 import ProductCard from '@/components/ProductCard';
-import { products, categories, ProductCategory } from '@/lib/products';
+import type { Product, ProductCategory } from '@/lib/shopify/types';
+
+const categories = [
+  { id: 'os', label: 'Sistemi Operativi', icon: 'Monitor', count: '3+' },
+  { id: 'office', label: 'Office & Produttivita', icon: 'FileText', count: '3+' },
+  { id: 'subscription', label: 'Software Pro', icon: 'Layers', count: '4+' },
+  { id: 'antivirus', label: 'Antivirus & Sicurezza', icon: 'Shield', count: '4+' },
+  { id: 'gaming', label: 'Giochi PC', icon: 'Gamepad2', count: '4+' },
+];
 
 const sortOptions = [
   { value: 'discount', label: 'Sconto maggiore' },
   { value: 'price-asc', label: 'Prezzo crescente' },
   { value: 'price-desc', label: 'Prezzo decrescente' },
   { value: 'rating', label: 'Valutazione' },
-  { value: 'popular', label: 'Più popolari' },
+  { value: 'popular', label: 'Piu popolari' },
 ];
 
-export default function ProductsContent() {
+interface ProductsContentProps {
+  products: Product[];
+}
+
+export default function ProductsContent({ products }: ProductsContentProps) {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') as ProductCategory | null;
   const initialSearch = searchParams.get('search') || '';

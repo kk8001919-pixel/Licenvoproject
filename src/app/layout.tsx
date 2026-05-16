@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
+import { CartProvider } from '@/lib/shopify/cart-context';
 import '../styles/tailwind.css';
 
 const inter = Inter({
@@ -42,8 +43,10 @@ export default function RootLayout({
   return (
     <html lang="it" className={`${montserrat.variable} ${inter.variable} bg-background`}>
       <body className={inter.className}>
-        {children}
-</body>
+        <CartProvider>
+          {children}
+        </CartProvider>
+      </body>
     </html>
   );
 }

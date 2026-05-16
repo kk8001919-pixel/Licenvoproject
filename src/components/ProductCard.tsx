@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
-import { Product } from '@/lib/products';
-import { useCartStore } from '@/lib/cart-store';
+import { Product } from '@/lib/shopify/types';
+import { useCart } from '@/lib/shopify/cart-context';
 
 interface ProductCardProps {
   product: Product;
@@ -25,12 +25,19 @@ const licenseConfig = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [added, setAdded] = useState(false);
-  const { addItem, openCart } = useCartStore();
+  const { addItem } = useCart();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product);
+    if (product.shopifyVariantId) {
+      addItem(product.shopifyVariantId, {
+        title: product.name,
+        image: product.image,
+        handle: product.id,
+        price: product.price,
+      });
+    }
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
   };

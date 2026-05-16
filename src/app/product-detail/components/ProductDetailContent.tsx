@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Icon from '@/components/ui/AppIcon';
 import ProductCarousel from '@/components/ProductCarousel';
-import { getProductById, getSimilarProducts, products, DurationVariant } from '@/lib/products';
-import { useCartStore } from '@/lib/cart-store';
+import type { Product, DurationVariant } from '@/lib/shopify/types';
+import { useCart } from '@/lib/shopify/cart-context';
 
 const mockReviews = [
   {
@@ -51,18 +50,18 @@ const mockReviews = [
   },
 ];
 
-export default function ProductDetailContent() {
-  const searchParams = useSearchParams();
-  const productId = searchParams.get('id') || products[0].id;
-  const product = getProductById(productId) || products[0];
-  const similar = getSimilarProducts(product, 6);
+interface ProductDetailContentProps {
+  product: Product;
+  similar: Product[];
+}
 
+export default function ProductDetailContent({ product, similar }: ProductDetailContentProps) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<DurationVariant | null>(
     product.durationVariants?.[0] ?? null
   );
-  const { addItem, openCart } = useCartStore();
+  const { addItem, openCart } = useCart();
 
   useEffect(() => {
     setSelectedVariant(product.durationVariants?.[0] ?? null);
@@ -74,19 +73,18 @@ export default function ProductDetailContent() {
   const activeDiscount = Math.round((1 - activePrice / activeOriginalPrice) * 100);
 
   const handleAddToCart = () => {
-    const productToAdd = selectedVariant
-      ? {
-          ...product,
-          id: `${product.id}-${selectedVariant.id}`,
-          price: selectedVariant.price,
-          originalPrice: selectedVariant.originalPrice,
-          name: `${product.name} — ${selectedVariant.label}`,
-          discount: activeDiscount,
-        }
-      : product;
+    const variantId = selectedVariant?.id || product.shopifyVariantId;
+    if (!variantId) return;
 
     for (let i = 0; i < qty; i++) {
-      addItem(productToAdd);
+      addItem(variantId, {
+        title: selectedVariant
+          ? `${product.name} — ${selectedVariant.label}`
+          : product.name,
+        image: product.image,
+        handle: product.id,
+        price: activePrice,
+      });
     }
     setAdded(true);
     setTimeout(() => {

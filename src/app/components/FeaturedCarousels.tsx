@@ -1,16 +1,20 @@
 import React from 'react';
 import ProductCarousel from '@/components/ProductCarousel';
-import {
-  getFeaturedProducts,
-  getHotDeals,
-  getProductsByCategory,
-} from '@/lib/products';
+import type { Product } from '@/lib/shopify/types';
 
-export default function FeaturedCarousels() {
-  const featured = getFeaturedProducts();
-  const hotDeals = getHotDeals();
-  const antivirus = getProductsByCategory('antivirus');
-  const gaming = getProductsByCategory('gaming');
+interface FeaturedCarouselsProps {
+  featured: Product[];
+  hotDeals: Product[];
+  antivirus: Product[];
+  gaming: Product[];
+}
+
+export default function FeaturedCarousels({
+  featured,
+  hotDeals,
+  antivirus,
+  gaming,
+}: FeaturedCarouselsProps) {
 
   return (
     <div className="space-y-16 pb-20">
