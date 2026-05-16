@@ -1,19 +1,19 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Fraunces, DM_Sans } from 'next/font/google';
+import { Inter, Montserrat } from 'next/font/google';
 import '../styles/tailwind.css';
 
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  weight: ['400', '600', '700', '900'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
+  display: 'swap',
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -40,8 +40,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="it" className={`${fraunces.variable} ${dmSans.variable}`}>
-      <body className={dmSans.className}>
+    <html lang="it" className={`${montserrat.variable} ${inter.variable} bg-background`}>
+      <body className={inter.className}>
         {children}
 </body>
     </html>
