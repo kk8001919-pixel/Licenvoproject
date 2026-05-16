@@ -1,108 +1,115 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import Link from 'next/link';
+import React from 'react';
 import Icon from '@/components/ui/AppIcon';
-import { useOrdersStore } from '@/lib/orders-store';
-import { useAdminStore } from '@/lib/admin-store';
 
-const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  completed: { label: 'Completato', color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
-  processing: { label: 'In elaborazione', color: 'text-amber-400', bg: 'bg-amber-500/10' },
-  refunded: { label: 'Rimborsato', color: 'text-red-400', bg: 'bg-red-500/10' },
-  pending: { label: 'In attesa', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-};
+const SHOPIFY_DOMAIN = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN || 'your-store';
+const SHOPIFY_ADMIN_URL = `https://${SHOPIFY_DOMAIN.replace('.myshopify.com', '')}.myshopify.com/admin`;
+
+const adminLinks = [
+  {
+    title: 'Prodotti',
+    description: 'Gestisci catalogo, prezzi, metafields e varianti',
+    icon: 'Package',
+    href: `${SHOPIFY_ADMIN_URL}/products`,
+    color: 'text-blue-400',
+    bg: 'bg-blue-500/10',
+  },
+  {
+    title: 'Ordini',
+    description: 'Visualizza e gestisci tutti gli ordini ricevuti',
+    icon: 'ShoppingBag',
+    href: `${SHOPIFY_ADMIN_URL}/orders`,
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-500/10',
+  },
+  {
+    title: 'Clienti',
+    description: 'Gestisci account clienti e informazioni',
+    icon: 'Users',
+    href: `${SHOPIFY_ADMIN_URL}/customers`,
+    color: 'text-violet-400',
+    bg: 'bg-violet-500/10',
+  },
+  {
+    title: 'Analytics',
+    description: 'Dashboard vendite, metriche e report',
+    icon: 'TrendingUp',
+    href: `${SHOPIFY_ADMIN_URL}/analytics`,
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/10',
+  },
+  {
+    title: 'Collezioni',
+    description: 'Organizza i prodotti in categorie',
+    icon: 'Layers',
+    href: `${SHOPIFY_ADMIN_URL}/collections`,
+    color: 'text-pink-400',
+    bg: 'bg-pink-500/10',
+  },
+  {
+    title: 'Impostazioni',
+    description: 'Pagamenti, spedizioni, checkout e altro',
+    icon: 'Settings',
+    href: `${SHOPIFY_ADMIN_URL}/settings`,
+    color: 'text-gray-400',
+    bg: 'bg-gray-500/10',
+  },
+];
 
 export default function DashboardPage() {
-  const { orders, seed } = useOrdersStore();
-  const { products, initProducts } = useAdminStore();
-
-  useEffect(() => { seed(); initProducts(); }, [seed, initProducts]);
-
-  const revenue = orders.filter(o => o.status === 'completed').reduce((a, o) => a + o.total, 0);
-  const customers = new Set(orders.map(o => o.customer.email)).size;
-  const completedOrders = orders.filter(o => o.status === 'completed').length;
-  const recentOrders = [...orders].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 6);
-
-  const stats = [
-    { label: 'Fatturato totale', value: `€${revenue.toFixed(2)}`, icon: 'TrendingUp', color: 'text-emerald-400', bg: 'bg-emerald-500/10', delta: '+12%' },
-    { label: 'Ordini completati', value: completedOrders.toString(), icon: 'ShoppingBag', color: 'text-blue-400', bg: 'bg-blue-500/10', delta: '+8%' },
-    { label: 'Clienti unici', value: customers.toString(), icon: 'Users', color: 'text-violet-400', bg: 'bg-violet-500/10', delta: '+5%' },
-    { label: 'Prodotti attivi', value: products.length.toString(), icon: 'Package', color: 'text-amber-400', bg: 'bg-amber-500/10', delta: 'Stabile' },
-  ];
-
-  const quickLinks = [
-    { href: '/admin/orders', label: 'Gestisci ordini', icon: 'ShoppingBag', color: 'from-blue-600 to-blue-800' },
-    { href: '/admin/products', label: 'Modifica prodotti', icon: 'Package', color: 'from-violet-600 to-indigo-700' },
-    { href: '/admin/customers', label: 'Vedi clienti', icon: 'Users', color: 'from-emerald-600 to-teal-700' },
-    { href: '/admin/policies', label: 'Modifica pagine', icon: 'FileText', color: 'from-amber-500 to-orange-600' },
-  ];
-
   return (
-    <div className="p-8 space-y-8">
-      <div>
-        <h1 className="font-display text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">Panoramica del negozio Licenvo</p>
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h1 className="font-display text-3xl font-bold text-foreground">
+          Pannello Amministrazione
+        </h1>
+        <p className="text-muted-foreground">
+          La gestione di prodotti, ordini e clienti avviene tramite il pannello Shopify.
+          Usa i link qui sotto per accedere rapidamente.
+        </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        {stats.map((s) => (
-          <div key={s.label} className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5 space-y-3">
+      {/* Quick links grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {adminLinks.map((link) => (
+          <a
+            key={link.title}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col gap-3 p-6 rounded-2xl border border-white/[0.06] bg-card hover:border-white/[0.12] hover:bg-card/80 transition-all"
+          >
             <div className="flex items-center justify-between">
-              <div className={`w-10 h-10 rounded-xl ${s.bg} flex items-center justify-center`}>
-                <Icon name={s.icon as 'TrendingUp'} size={18} className={s.color} />
+              <div className={`w-10 h-10 rounded-xl ${link.bg} flex items-center justify-center`}>
+                <Icon name={link.icon as 'Package'} size={20} className={link.color} />
               </div>
-              <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg">{s.delta}</span>
+              <Icon name="ExternalLink" size={14} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div>
-              <p className="font-display text-2xl font-black text-foreground">{s.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
+              <h3 className="font-display text-base font-bold text-foreground mb-1">
+                {link.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {link.description}
+              </p>
             </div>
-          </div>
+          </a>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-[1fr_280px] gap-6">
-        {/* Recent orders */}
-        <div className="bg-[#111118] border border-white/[0.06] rounded-2xl overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
-            <h2 className="font-display font-bold text-foreground">Ordini recenti</h2>
-            <Link href="/admin/orders" className="text-xs text-primary hover:underline">Vedi tutti →</Link>
-          </div>
-          <div className="divide-y divide-white/[0.04]">
-            {recentOrders.map((order) => {
-              const st = STATUS_LABELS[order.status];
-              return (
-                <div key={order.id} className="flex items-center gap-4 px-6 py-3.5">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground">{order.customer.firstName} {order.customer.lastName}</p>
-                    <p className="text-xs text-muted-foreground truncate">{order.id} · {new Date(order.date).toLocaleDateString('it-IT')}</p>
-                  </div>
-                  <span className={`text-[11px] font-bold px-2 py-1 rounded-lg ${st.color} ${st.bg}`}>{st.label}</span>
-                  <span className="text-sm font-bold text-foreground w-16 text-right">€{order.total.toFixed(2)}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Quick links */}
-        <div className="space-y-3">
-          <h2 className="font-display font-bold text-foreground">Azioni rapide</h2>
-          {quickLinks.map((ql) => (
-            <Link
-              key={ql.href}
-              href={ql.href}
-              className="flex items-center gap-3 p-4 bg-[#111118] border border-white/[0.06] rounded-2xl hover:border-white/20 transition-all group"
-            >
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${ql.color} flex items-center justify-center flex-shrink-0`}>
-                <Icon name={ql.icon as 'ShoppingBag'} size={17} className="text-white" />
-              </div>
-              <span className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{ql.label}</span>
-              <Icon name="ChevronRight" size={14} className="text-muted-foreground ml-auto" />
-            </Link>
-          ))}
+      {/* Info box */}
+      <div className="flex items-start gap-3 p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20">
+        <Icon name="Info" size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="text-sm font-medium text-blue-400 mb-1">
+            Integrazione Shopify Headless
+          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Questo sito e connesso a Shopify tramite la Storefront API. I prodotti, le varianti e i
+            metafields configurati nel pannello Shopify vengono visualizzati automaticamente nel frontend.
+            Il checkout e gestito interamente da Shopify.
+          </p>
         </div>
       </div>
     </div>
