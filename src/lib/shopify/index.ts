@@ -27,8 +27,6 @@ async function shopifyFetch<T>({
   variables?: Record<string, unknown>;
   cache?: RequestCache;
 }): Promise<{ data: T; errors?: unknown[] }> {
-  console.log('[v0] Shopify fetch to:', SHOPIFY_STOREFRONT_API_URL, 'token present:', !!SHOPIFY_STOREFRONT_TOKEN);
-
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -44,11 +42,8 @@ async function shopifyFetch<T>({
     cache: cacheStrategy,
   });
 
-  console.log('[v0] Shopify response status:', response.status);
-
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error('[v0] Shopify API error body:', errorBody);
     throw new Error(
       `Shopify API HTTP error! Status: ${response.status}, Body: ${errorBody}`,
     );
