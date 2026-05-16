@@ -10,21 +10,29 @@ import { getProducts, getCollectionProducts } from '@/lib/shopify';
 import { mapShopifyProducts } from '@/lib/shopify/mappers';
 
 export default async function HomePage() {
-  // Fetch products from Shopify in parallel
-  const [allProducts, antivirusRaw, gamingRaw] = await Promise.all([
-    getProducts({ first: 20 }).catch(() => []),
-    getCollectionProducts({ collection: 'antivirus-sicurezza', limit: 8 }).catch(() => []),
-    getCollectionProducts({ collection: 'giochi-pc', limit: 8 }).catch(() => []),
+  // Fetch all products from Shopify
+  // Also try "frontpage" collection for featured items
+  const [allProducts, frontpageRaw] = await Promise.all([
+    getProducts({ first: 50 }).catch(() => []),
+    getCollectionProducts({ collection: 'frontpage', limit: 10 }).catch(() => []),
   ]);
 
   // Map Shopify products to Licenvo Product type
   const products = mapShopifyProducts(allProducts);
-  const antivirus = mapShopifyProducts(antivirusRaw, 'antivirus-sicurezza');
-  const gaming = mapShopifyProducts(gamingRaw, 'giochi-pc');
+  const frontpage = mapShopifyProducts(frontpageRaw, 'frontpage');
 
-  // Derive featured and hot deals from all products
-  const featured = products.filter((p) => p.badge === 'bestseller');
-  const hotDeals = products.filter((p) => p.discount >= 80);
+  // Derive sections from all products by category/vendor
+  const featured = frontpage.length > 0
+    ? frontpage
+    : products.slice(0, 8);
+
+  const antivirus = products.filter((p) => p.category === 'antivirus');
+  const office = products.filter((p) => p.category === 'office');
+  const subscription = products.filter((p) => p.category === 'subscription');
+
+  // Hot deals = products with discount, or fallback to subscription software
+  const hotDeals = products.filter((p) => p.discount > 0);
+  const hotDealsOrFallback = hotDeals.length > 0 ? hotDeals : subscription.slice(0, 8);
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,9 +44,9 @@ export default async function HomePage() {
           <CategoryGrid />
           <FeaturedCarousels
             featured={featured}
-            hotDeals={hotDeals}
+            hotDeals={hotDealsOrFallback}
             antivirus={antivirus}
-            gaming={gaming}
+            gaming={office}
           />
         </div>
         <TrustBar />
