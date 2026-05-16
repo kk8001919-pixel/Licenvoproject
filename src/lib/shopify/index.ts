@@ -14,9 +14,10 @@ const SHOPIFY_STORE_DOMAIN = rawStoreDomain
   ? parseShopifyDomain(rawStoreDomain)
   : fallbackStoreDomain;
 
-const SHOPIFY_STOREFRONT_API_URL = `https://${SHOPIFY_STORE_DOMAIN}/api/2025-04/graphql.json`;
+const SHOPIFY_STOREFRONT_API_URL = `https://${SHOPIFY_STORE_DOMAIN}/api/2025-01/graphql.json`;
+const SHOPIFY_STOREFRONT_TOKEN = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || '';
 
-// Tokenless Shopify Storefront API request
+// Authenticated Shopify Storefront API request
 async function shopifyFetch<T>({
   query,
   variables = {},
@@ -26,17 +27,28 @@ async function shopifyFetch<T>({
   variables?: Record<string, unknown>;
   cache?: RequestCache;
 }): Promise<{ data: T; errors?: unknown[] }> {
+  console.log('[v0] Shopify fetch to:', SHOPIFY_STOREFRONT_API_URL, 'token present:', !!SHOPIFY_STOREFRONT_TOKEN);
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (SHOPIFY_STOREFRONT_TOKEN) {
+    headers['X-Shopify-Storefront-Access-Token'] = SHOPIFY_STOREFRONT_TOKEN;
+  }
+
   const response = await fetch(SHOPIFY_STOREFRONT_API_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
     body: JSON.stringify({ query, variables }),
     cache: cacheStrategy,
   });
 
+  console.log('[v0] Shopify response status:', response.status);
+
   if (!response.ok) {
     const errorBody = await response.text();
+    console.error('[v0] Shopify API error body:', errorBody);
     throw new Error(
       `Shopify API HTTP error! Status: ${response.status}, Body: ${errorBody}`,
     );
