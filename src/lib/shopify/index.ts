@@ -8,7 +8,7 @@ import type {
 import { parseShopifyDomain } from './parse-shopify-domain';
 import { DEFAULT_PAGE_SIZE, DEFAULT_SORT_KEY } from './constants';
 
-const rawStoreDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
+const rawStoreDomain = process.env.SHOPIFY_STORE_DOMAIN || process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
 const fallbackStoreDomain = 'v0-template.myshopify.com';
 const SHOPIFY_STORE_DOMAIN = rawStoreDomain
   ? parseShopifyDomain(rawStoreDomain)
