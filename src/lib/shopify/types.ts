@@ -39,7 +39,6 @@ export type ShopifyProduct = {
   vendor: string;
   availableForSale: boolean;
   productType: string | null;
-  tags: string[];
   images: {
     edges: Array<{ node: ShopifyProductImage }>;
   };
