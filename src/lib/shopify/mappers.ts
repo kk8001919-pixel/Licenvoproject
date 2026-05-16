@@ -115,7 +115,10 @@ function mapVariantsToDuration(shopifyProduct: ShopifyProduct): DurationVariant[
   for (const edge of shopifyProduct.variants.edges) {
     const variant = edge.node;
     const durataOption = variant.selectedOptions.find(
-      (opt) => opt.name.toLowerCase() === 'durata' || opt.name.toLowerCase() === 'duration',
+      (opt) => {
+        const name = opt.name.toLowerCase();
+        return name === 'durata' || name === 'duration' || name === 'durata licenza';
+      },
     );
 
     if (durataOption) {
