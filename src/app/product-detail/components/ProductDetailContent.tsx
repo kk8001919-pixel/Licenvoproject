@@ -159,7 +159,7 @@ export default function ProductDetailContent({ product, similar }: ProductDetail
               {/* Delivery badge */}
               <div className="absolute bottom-6 right-6 flex items-center gap-2 bg-black/60 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2 rounded-xl border border-white/20">
                 <Icon name={product.deliveryType === 'instant' ? 'Zap' : 'Clock'} size={15} className="text-yellow-400" />
-                {product.deliveryType === 'instant' ? 'Consegna istantanea' : 'Consegna entro 24h'}
+                {product.deliveryType === 'instant' ? 'Consegna istantanea' : product.deliveryType === '15min' ? 'Consegna entro 15 min' : 'Consegna entro 24h'}
               </div>
             </div>
 

@@ -50,12 +50,27 @@ export function mapShopifyToProduct(
   // Parse metafields
   const features = parseListMetafield(shopifyProduct.features?.value);
   const platforms = parseListMetafield(shopifyProduct.platforms?.value);
-  const deliveryType = (shopifyProduct.deliveryType?.value || 'instant') as DeliveryType;
   const licenseType = (shopifyProduct.licenseType?.value || 'lifetime') as LicenseType;
   const badge = shopifyProduct.badge?.value as BadgeType | undefined;
   const bgColor = shopifyProduct.bgColor?.value || 'from-blue-600 to-blue-800';
   const rating = parseFloat(shopifyProduct.rating?.value || '4.5');
   const reviewCount = parseInt(shopifyProduct.reviewCount?.value || '0', 10);
+
+  // Detect Autodesk products: delivery is 15min (not instant), requires Autodesk email
+  const isAutodesk = shopifyProduct.vendor?.toLowerCase() === 'autodesk'
+    || shopifyProduct.title.toLowerCase().includes('autodesk')
+    || shopifyProduct.title.toLowerCase().includes('autocad')
+    || shopifyProduct.title.toLowerCase().includes('revit')
+    || shopifyProduct.title.toLowerCase().includes('maya')
+    || shopifyProduct.title.toLowerCase().includes('civil 3d')
+    || shopifyProduct.title.toLowerCase().includes('arnold')
+    || shopifyProduct.title.toLowerCase().includes('fusion')
+    || shopifyProduct.title.toLowerCase().includes('infraworks')
+    || shopifyProduct.title.toLowerCase().includes('inventor');
+
+  const deliveryType = isAutodesk
+    ? '15min' as DeliveryType
+    : (shopifyProduct.deliveryType?.value || 'instant') as DeliveryType;
 
   // Map Shopify variants to durationVariants (for products with "Durata" option)
   const durationVariants = mapVariantsToDuration(shopifyProduct);
@@ -88,6 +103,7 @@ export function mapShopifyToProduct(
     shopifyVariantId: firstVariant?.id,
     shopifyProductId: shopifyProduct.id,
     image: firstImage?.url,
+    isAutodesk,
   };
 }
 

@@ -85,7 +85,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Delivery */}
           <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/50 backdrop-blur-sm text-white/80 text-[10px] font-medium px-2 py-1 rounded-lg border border-white/10">
             <Icon name={product.deliveryType === 'instant' ? 'Zap' : 'Clock'} size={10} />
-            {product.deliveryType === 'instant' ? 'Istantaneo' : '24h'}
+            {product.deliveryType === 'instant' ? 'Istantaneo' : product.deliveryType === '15min' ? 'Entro 15 min' : '24h'}
           </div>
         </div>
 

@@ -125,7 +125,7 @@ export type ProductCollectionSortKey =
 // ============================================
 
 export type ProductCategory = 'os' | 'office' | 'subscription' | 'antivirus' | 'gaming';
-export type DeliveryType = 'instant' | '24h';
+export type DeliveryType = 'instant' | '24h' | '15min';
 export type LicenseType = 'lifetime' | 'annual' | 'monthly';
 export type BadgeType = 'bestseller' | 'hot' | 'new' | 'sale';
 
@@ -160,4 +160,6 @@ export interface Product {
   shopifyVariantId?: string;
   shopifyProductId?: string;
   image?: string;
+  // Autodesk products require the customer's Autodesk email for license assignment
+  isAutodesk?: boolean;
 }
